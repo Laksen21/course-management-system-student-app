@@ -28,8 +28,36 @@ export default function BottomTabNav() {
                 tabBarLabelStyle: { fontSize: 14, fontWeight: 'bold' },
             })}
         >
-            <Tab.Screen name="Courses" component={CoursesPage} />
-            <Tab.Screen name="User" component={UserPage} />
+            <Tab.Screen name="Courses" component={CoursesPage}
+                options={{
+                    headerTitle: 'Your Courses',
+                    headerStyle: {
+                        backgroundColor: '#6750a4',
+                        height: 60,
+                        borderBottomStartRadius: 6,
+                        borderBottomEndRadius: 6
+                    },
+                    headerTintColor: '#edeaf5',
+                    headerTitleStyle: {
+                        fontWeight: '900',
+                    },
+                }}
+            />
+            <Tab.Screen name="User" component={UserPage}
+                options={{
+                    headerTitle: 'User Profile',
+                    headerStyle: {
+                        backgroundColor: '#6750a4',
+                        height: 60,
+                        borderBottomStartRadius: 6,
+                        borderBottomEndRadius: 6
+                    },
+                    headerTintColor: '#edeaf5',
+                    headerTitleStyle: {
+                        fontWeight: 'bold',
+                    },
+                }}
+            />
         </Tab.Navigator>
     );
 } 
