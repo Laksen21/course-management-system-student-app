@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, FlatList, StyleSheet } from 'react-native';
-import { Card, Text, ActivityIndicator } from 'react-native-paper';
+import { View, FlatList, StyleSheet, StatusBar } from 'react-native';
+import { Card, Text, ActivityIndicator, Surface, IconButton } from 'react-native-paper';
 
 function CoursesPage({ navigation }) {
     const [studentId, setStudentId] = useState('');
@@ -53,10 +53,11 @@ function CoursesPage({ navigation }) {
                 })
                 .catch(function (error) {
                     console.log(error);
-                    setLoading(true);
+                    setLoading(false);
                 });
         } else {
             console.log('Token not found.');
+            setLoading(false);
         }
     }
 
@@ -64,26 +65,42 @@ function CoursesPage({ navigation }) {
         navigation.navigate("Videos", { courseId: courseId, courseCode: courseCode })
     }
 
+    const renderCourseItem = ({ item: course }) => (
+        <Surface style={styles.cardSurface} elevation={2}>
+            <Card
+                style={styles.card}
+                onPress={() => handleClickCourse(course.id, course.code)}
+            >
+                <Card.Content>
+                    <Text style={styles.courseCode}>{course.code}</Text>
+                    <Text style={styles.courseTitle}>{course.title}</Text>
+                </Card.Content>
+                <Card.Actions style={styles.cardActions}>
+                    <IconButton
+                        icon="arrow-right"
+                        mode="contained"
+                        size={20}
+                        onPress={() => handleClickCourse(course.id, course.code)}
+                    />
+                </Card.Actions>
+            </Card>
+        </Surface>
+    );
+
     return (
         <View style={styles.container}>
+            <StatusBar backgroundColor="#5d4894" barStyle="light-content" />
+            <Surface style={styles.header} elevation={4}>
+                <Text style={styles.headerText}>Courses</Text>
+            </Surface>
             {loading ? (
                 <ActivityIndicator animating={true} size={'large'} color={'#6750a4'} style={styles.loader} />
             ) : (
                 <FlatList
                     data={courses}
-                    renderItem={({ item: course }) =>
-                        <Card
-                            style={styles.card}
-                            onPress={() => handleClickCourse(course.id, course.code)}
-                        >
-                            <Card.Cover source={{ uri: 'https://picsum.photos/700' }} />
-                            <Card.Content >
-                                <Text style={styles.cardText} variant="bodyMedium">{course.code}</Text>
-                                <Text style={styles.cardText} variant="titleLarge">{course.title}</Text>
-                            </Card.Content>
-                        </Card>
-                    }
+                    renderItem={renderCourseItem}
                     keyExtractor={(course) => course.id.toString()}
+                    contentContainerStyle={styles.listContainer}
                 />
             )}
         </View>
@@ -93,14 +110,42 @@ function CoursesPage({ navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#f5f5f5',
+    },
+    header: {
+        paddingVertical: 16,
+        paddingHorizontal: 20,
+        backgroundColor: '#6750a4',
+    },
+    headerText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#ffffff',
+    },
+    listContainer: {
+        padding: 16,
+    },
+    cardSurface: {
+        marginBottom: 16,
+        borderRadius: 8,
+        overflow: 'hidden',
     },
     card: {
-        margin: 10,
-        backgroundColor:'#edeaf5'
+        backgroundColor: '#f0eef6',
     },
-    cardText: {
-       color: '#6750a4',
-       fontWeight: 'bold',
+    courseCode: {
+        fontSize: 14,
+        color: '#6750a4',
+        fontWeight: 'bold',
+        marginBottom: 4,
+    },
+    courseTitle: {
+        fontSize: 22,
+        color: '#6750a4',
+        fontWeight: 'bold',
+    },
+    cardActions: {
+        justifyContent: 'flex-end',
     },
     loader: {
         flex: 1,

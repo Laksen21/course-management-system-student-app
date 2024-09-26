@@ -29,34 +29,10 @@ export default function BottomTabNav() {
             })}
         >
             <Tab.Screen name="Courses" component={CoursesPage}
-                options={{
-                    headerTitle: 'Your Courses',
-                    headerStyle: {
-                        backgroundColor: '#6750a4',
-                        height: 60,
-                        borderBottomStartRadius: 6,
-                        borderBottomEndRadius: 6
-                    },
-                    headerTintColor: '#edeaf5',
-                    headerTitleStyle: {
-                        fontWeight: '900',
-                    },
-                }}
+                options={{ headerShown: false }}
             />
             <Tab.Screen name="User" component={UserPage}
-                options={{
-                    headerTitle: 'User Profile',
-                    headerStyle: {
-                        backgroundColor: '#6750a4',
-                        height: 60,
-                        borderBottomStartRadius: 6,
-                        borderBottomEndRadius: 6
-                    },
-                    headerTintColor: '#edeaf5',
-                    headerTitleStyle: {
-                        fontWeight: 'bold',
-                    },
-                }}
+                options={{ headerShown: false }}
             />
         </Tab.Navigator>
     );

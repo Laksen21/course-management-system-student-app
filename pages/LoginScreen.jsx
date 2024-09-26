@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, Image, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet, StatusBar } from 'react-native';
 import { TextInput, Button } from 'react-native-paper';
 import { ALERT_TYPE, Dialog, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
 
@@ -115,6 +115,7 @@ function LoginScreen({ navigation }) {
     return (
         <AlertNotificationRoot>
             <View style={styles.container}>
+            <StatusBar backgroundColor="#5d4894" barStyle="light-content" />
                 <Image
                     source={require('../assets/logo.png')}
                     style={styles.logo}

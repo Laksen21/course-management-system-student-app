@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from './pages/LoginScreen';
 import BottomTabNav from './components/BottomTabNav';
 import VideosPage from './pages/VideosPage';
+import VideoPlayer from './pages/VideoPlayer';
 
 const Stack = createStackNavigator()
 
@@ -18,17 +19,17 @@ function App() {
         <Stack.Screen name="Videos" component={VideosPage}
           options={{
             headerStyle: {
-              backgroundColor: '#6750a4',
-              height: 60,
-              borderBottomStartRadius: 6,
-              borderBottomEndRadius: 6
+                backgroundColor: '#6750a4',
+                height: 65
             },
-            headerTintColor: '#edeaf5',
+            headerTintColor: '#ffffff',
             headerTitleStyle: {
-              fontWeight: '900',
+                fontWeight: 'bold',
+                fontSize: 24,
             },
           }}
         />
+        <Stack.Screen options={{ headerShown: false }} name="VideoPlayer" component={VideoPlayer} />
       </Stack.Navigator>
     </NavigationContainer>
   );

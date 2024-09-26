@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
-import { Card, Text, ActivityIndicator } from 'react-native-paper';
+import { View, FlatList, StyleSheet, StatusBar, Image } from 'react-native';
+import { Card, Text, ActivityIndicator, Surface, IconButton } from 'react-native-paper';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -50,34 +50,51 @@ function VideosPage({ route, navigation }) {
         }
     }
 
-    const handleClickVideo = (id) => {
-        navigation.navigate("VideoScreen", { videoId: id });
+    const handleClickVideo = (id,name) => {
+        navigation.navigate("VideoPlayer", { videoId: id }, { videoName: name });
     }
+
+    const renderVideoItem = ({ item: video }) => (
+        <Surface style={styles.cardSurface} elevation={2}>
+            <Card
+                style={styles.card}
+                onPress={() => handleClickVideo(video.id, video.name)}
+            >
+                <Image 
+                    source={{ uri: `${serverUrl}/video/thumbnail/${video.id}?t=${new Date().getTime()}` }}
+                    style={styles.cardCover}
+                    resizeMode="cover"
+                />
+                <Card.Content style={styles.cardContent}>
+                    <Text style={styles.videoTitle} numberOfLines={2} ellipsizeMode="tail">
+                        {video.name}
+                    </Text>
+                </Card.Content>
+                <Card.Actions style={styles.cardActions}>
+                    <IconButton
+                        icon="play-circle"
+                        mode="contained"
+                        size={24}
+                        iconColor="#6750a4"
+                        onPress={() => handleClickVideo(video.id, video.name)}
+                    />
+                </Card.Actions>
+            </Card>
+        </Surface>
+    );
 
     return (
         <View style={styles.container}>
+            <StatusBar backgroundColor="#5d4894" barStyle="light-content"/>
             {loading ? (
                 <ActivityIndicator animating={true} size={'large'} color={'#6750a4'} style={styles.loader} />
             ) : (
-                <ScrollView>
-                    {videos.map(video => (
-                        <Card
-                            key={video.id}
-                            style={styles.card}
-                            onPress={() => handleClickVideo(video.id)}
-                        >
-                            <Card.Cover source={{ uri: video.thumbnailFilePath }} />
-                            <Card.Content>
-                                <Text style={styles.cardText} variant="titleLarge">
-                                    {video.name}
-                                </Text>
-                                {/* <Text style={styles.videoDescription} variant="titleLarge">
-                                    {video.description}
-                                </Text> */}
-                            </Card.Content>
-                        </Card>
-                    ))}
-                </ScrollView>
+                <FlatList
+                    data={videos}
+                    renderItem={renderVideoItem}
+                    keyExtractor={(video) => video.id.toString()}
+                    contentContainerStyle={styles.listContainer}
+                />
             )}
         </View>
     );
@@ -86,16 +103,43 @@ function VideosPage({ route, navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#f5f5f5',
+    },
+    header: {
+        paddingVertical: 16,
+        paddingHorizontal: 20,
+        backgroundColor: '#6750a4',
+    },
+    headerText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#ffffff',
+    },
+    listContainer: {
+        padding: 16,
+    },
+    cardSurface: {
+        marginBottom: 16,
+        borderRadius: 8,
+        overflow: 'hidden',
     },
     card: {
-        height: '10px',
-        margin: 10,
-        backgroundColor: '#edeaf5'
+        backgroundColor: '#f0eef6',
     },
-    cardText: {
-        marginTop: 10,
+    cardCover: {
+        height: 150,
+    },
+    cardContent: {
+        paddingTop: 8,
+        paddingBottom: 4,
+    },
+    videoTitle: {
+        fontSize: 18,
         color: '#6750a4',
         fontWeight: 'bold',
+    },
+    cardActions: {
+        justifyContent: 'flex-end',
     },
     loader: {
         flex: 1,
