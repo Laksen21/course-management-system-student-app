@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, StatusBar, Image } from 'react-native';
+import { View, FlatList, StyleSheet, Image } from 'react-native';
 import { Card, Text, ActivityIndicator, Surface, IconButton } from 'react-native-paper';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -85,7 +85,6 @@ function VideosPage({ route, navigation }) {
 
     return (
         <View style={styles.container}>
-            <StatusBar backgroundColor="#5d4894" barStyle="light-content"/>
             {loading ? (
                 <ActivityIndicator animating={true} size={'large'} color={'#6750a4'} style={styles.loader} />
             ) : (

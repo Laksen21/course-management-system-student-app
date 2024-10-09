@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, Image, StyleSheet, StatusBar } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
 import { TextInput, Button } from 'react-native-paper';
 import { ALERT_TYPE, Dialog, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
 
@@ -9,17 +9,6 @@ function LoginScreen({ navigation }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const serverUrl = "http://192.168.1.100:8080";
-
-    useEffect(() => {
-        const checkStoredCredentials = async () => {
-            await retrieveEmailAndPassword();
-            if (email && password) {
-                handleLogin();
-            }
-        };
-
-        checkStoredCredentials();
-    }, []);
 
     const retrieveEmailAndPassword = async () => {
         try {
@@ -35,6 +24,70 @@ function LoginScreen({ navigation }) {
             console.log('Error retrieving credentials:', e);
         }
     };
+
+    const handleLogin = () => {
+        if (email === "" || password === "") {
+            alertEmptyFields();
+        } else {
+            axios.post(`${serverUrl}/student/login`, {
+                "email": email,
+                "appPassword": password
+            })
+                .then(function (response) {
+                    // console.log(response);
+                    if (response.data.token) {
+                        storeToken(response.data.token);
+                        storeEmail(response.data.username);
+                        storePassword(password);
+                        storeStudentId(response.data.id);
+                        navigation.navigate("tabs");
+                        setEmail('');
+                        setPassword('');
+                    }
+                })
+                .catch(function (error) {
+                    // console.log(error);
+                    // alertInvalid();
+                    console.log(error.response.status);
+                    // Handle network or server errors based on response status
+                    if (error.response) {
+                        // Server responded with a status code outside 2xx range
+                        const status = error.response.status;
+
+                        if (status === 404) {
+                            // No user found with the given email
+                            showErrorDialog('User Not Found', 'No user found with this email address.');
+                        } else if (status === 400) {
+                            // Incorrect password provided
+                            showErrorDialog('Incorrect Password', 'The password you entered is incorrect.');
+                        } else if (status === 401) {
+                            // Unauthorized access (could indicate incorrect credentials)
+                            showErrorDialog('Unauthorized', 'Invalid credentials. Please try again.');
+                        } else {
+                            // Generic server error for other status codes
+                            showErrorDialog('Server Error', `Something went wrong. (Status: ${status})`);
+                        }
+                    } else if (error.request) {
+                        // No response received (likely a network issue)
+                        showErrorDialog('Network Error', 'Unable to connect to the server. Please check your internet connection.');
+                    } else {
+                        // Error in setting up the request
+                        showErrorDialog('Error', 'An unknown error occurred. Please try again.');
+                    }
+                });
+        }
+    };
+
+    useEffect(() => {
+        const checkStoredCredentials = async () => {
+            await retrieveEmailAndPassword();
+            if (email && password) {
+                handleLogin();
+            }
+        };
+
+        checkStoredCredentials();
+    }, []);
 
     // Store token in AsyncStorage
     const storeToken = async (value) => {
@@ -69,32 +122,6 @@ function LoginScreen({ navigation }) {
         }
     };
 
-    const handleLogin = () => {
-        if (email === "" || password === "") {
-            alertEmptyFields();
-        } else {
-            axios.post(`${serverUrl}/student/login`, {
-                "email": email,
-                "appPassword": password
-            })
-                .then(function (response) {
-                    // console.log(response);
-                    if (response.data.token) {
-                        storeToken(response.data.token);
-                        storeEmail(response.data.username);
-                        storePassword(password);
-                        storeStudentId(response.data.id);
-                        navigation.navigate("tabs");
-                        // setPassword('');
-                    }
-                })
-                .catch(function (error) {
-                    console.log(error);
-                    alertInvalid();
-                });
-        }
-    };
-
     const alertEmptyFields = () => {
         Toast.show({
             type: ALERT_TYPE.WARNING,
@@ -112,10 +139,18 @@ function LoginScreen({ navigation }) {
         })
     };
 
+    const showErrorDialog = (title, message) => {
+        Dialog.show({
+            type: ALERT_TYPE.DANGER,
+            title: title,
+            textBody: message,
+            button: 'Close',
+        });
+    };
+
     return (
-        <AlertNotificationRoot>
+        <AlertNotificationRoot theme="light">
             <View style={styles.container}>
-            <StatusBar backgroundColor="#5d4894" barStyle="light-content" />
                 <Image
                     source={require('../assets/logo.png')}
                     style={styles.logo}

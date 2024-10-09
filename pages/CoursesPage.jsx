@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, FlatList, StyleSheet, StatusBar } from 'react-native';
+import { View, FlatList, StyleSheet } from 'react-native';
 import { Card, Text, ActivityIndicator, Surface, IconButton } from 'react-native-paper';
 
 function CoursesPage({ navigation }) {
@@ -50,6 +50,7 @@ function CoursesPage({ navigation }) {
                 .then(function (response) {
                     setCourses(response.data.courses);
                     setLoading(false);
+                    setStudentData(response.data);
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -59,6 +60,17 @@ function CoursesPage({ navigation }) {
             console.log('Token not found.');
             setLoading(false);
         }
+    }
+
+    const setStudentData = async (student) => {
+        try {
+            await AsyncStorage.setItem('studentName', student.name);
+            await AsyncStorage.setItem('studentAddress', student.address);
+            await AsyncStorage.setItem('studentTelNo', student.tel_no);
+        } catch (e) {
+            console.log(e);
+        }
+        // console.log(student);
     }
 
     const handleClickCourse = (courseId, courseCode) => {
@@ -89,7 +101,6 @@ function CoursesPage({ navigation }) {
 
     return (
         <View style={styles.container}>
-            <StatusBar backgroundColor="#5d4894" barStyle="light-content" />
             <Surface style={styles.header} elevation={4}>
                 <Text style={styles.headerText}>Courses</Text>
             </Surface>
